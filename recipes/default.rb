@@ -79,11 +79,34 @@ if platform_family?('debian')
 	  	edit = Chef::Util::FileEdit.new '/etc/ssh/sshd_config'
 	    edit.insert_line_if_no_match(/^AuthorizedKeysCommand/, 'AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys')
 	    edit.insert_line_if_no_match(/^AuthorizedKeysCommandUser/, 'AuthorizedKeysCommandUser root')
-
 	    edit.write_file
 	  end
     action :run
 	end
+end
+
+# Update PAM file so that user's home directories are automatically created when they login for the first time
+if (node['sssd_ldap']['ldap_ssh'] && node['sssd_ldap']['pam_mkhomedir'])
+  case node['platform_family']
+    when 'debian'
+      template '/usr/share/pam-configs/my_mkhomedir' do
+        source 'mkhomedir.erb'
+        owner 'root'
+        group 'root'
+        mode '0644'
+        notifies :run, 'execute[pam-auth-update]'
+      end
+      execute 'pam-auth-update' do
+        command 'pam-auth-update --package'
+        action :run
+      end
+    when 'fedora', 'rhel'
+      bash 'authconfig' do
+        user 'root'
+        code 'authconfig --enablesssd --enablesssdauth --enablemkhomedir --update'
+        not_if 'grep -q pam_oddjob_mkhomedir /etc/pam.d/*'
+      end
+  end
 end
 
 # sssd automatically modifies the PAM files with pam-auth-update and /etc/nsswitch.conf, so all that's left is to configure /etc/sssd/sssd.conf
