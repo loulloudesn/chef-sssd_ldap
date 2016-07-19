@@ -69,6 +69,23 @@ if platform_family?('rhel')
   end
 end
 
+
+# Run on Ubuntu
+# Edit /etc/ssh/sshd_config and append the AuthorizedKeysCommand, so that SSSD retrieves user's public key from LDAP and uses it for authentication
+if platform_family?('debian')
+
+	ruby_block 'sshd_append_keyscommand' do
+	  block do
+	  	edit = Chef::Util::FileEdit.new '/etc/ssh/sshd_config'
+	    edit.insert_line_if_no_match(/^AuthorizedKeysCommand/, 'AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys')
+	    edit.insert_line_if_no_match(/^AuthorizedKeysCommandUser/, 'AuthorizedKeysCommandUser root')
+
+	    edit.write_file
+	  end
+    action :run
+	end
+end
+
 # sssd automatically modifies the PAM files with pam-auth-update and /etc/nsswitch.conf, so all that's left is to configure /etc/sssd/sssd.conf
 template '/etc/sssd/sssd.conf' do
   source 'sssd.conf.erb'
@@ -93,5 +110,28 @@ end
 
 service 'sssd' do
   supports status: true, restart: true, reload: true
+  action [:enable, :start]
+end
+
+
+# SSH Service
+service_provider = nil
+
+if platform_family?('ubuntu')
+  if Chef::VersionConstraint.new('>= 15.04').include?(node['platform_version'])
+    service_provider = Chef::Provider::Service::Systemd
+  elsif Chef::VersionConstraint.new('>= 12.04').include?(node['platform_version'])
+    service_provider = Chef::Provider::Service::Upstart
+  end
+end
+
+service 'ssh' do
+  provider service_provider
+  service_name node['sssd_ldap']['ssh_service_name']
+  supports value_for_platform_family(
+    %w(debian rhel fedora) => [:restart, :reload, :status],
+    %w(arch) =>  [:restart],
+    'default' => [:restart, :reload]
+  )
   action [:enable, :start]
 end
