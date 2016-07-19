@@ -17,6 +17,13 @@
 # limitations under the License.
 #
 
+default['sssd_ldap']['ssh_service_name'] = case node['platform_family']
+                                     when 'rhel', 'fedora', 'suse', 'freebsd', 'gentoo', 'arch'
+                                       'sshd'
+                                     else
+                                       'ssh'
+                                     end
+
 default['sssd_ldap']['sssd_conf']['id_provider'] = 'ldap'
 default['sssd_ldap']['sssd_conf']['auth_provider'] = 'ldap'
 default['sssd_ldap']['sssd_conf']['chpass_provider'] = 'ldap'
