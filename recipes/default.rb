@@ -140,7 +140,7 @@ end
 # SSH Service
 service_provider = nil
 
-if platform_family?('ubuntu')
+if platform_family?('debian ')
   if Chef::VersionConstraint.new('>= 15.04').include?(node['platform_version'])
     service_provider = Chef::Provider::Service::Systemd
   elsif Chef::VersionConstraint.new('>= 12.04').include?(node['platform_version'])
@@ -156,5 +156,5 @@ service 'ssh' do
     %w(arch) =>  [:restart],
     'default' => [:restart, :reload]
   )
-  action [:enable, :start]
+  action [:enable, :restart]
 end
