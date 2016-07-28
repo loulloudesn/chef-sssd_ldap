@@ -30,8 +30,7 @@ Arbitrary key/value pairs may be added to the `['sssd_conf']` attribute object. 
 
 Attribute                                  | Value                                                                          | Comment
 ------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------
-`['sssd_ldap']['chef_vault']`              | `'true`                   | use chef-vault (true/false) for retrieving sensitive SSSD information. For now support is provided only for `bind_dn` and `bind_password`. Hence, if se to true, default attributes `['sssd_conf']['ldap_default_bind_dn']` and `['sssd_conf']['ldap_default_authtok']`  are overriden                  
-
+`['sssd_ldap']['chef_vault']`              | `'true'`                                                                      | use chef-vault (true/false) for retrieving sensitive SSSD information. For now support is provided only for `bind_dn` and `bind_password`. Hence, if se to true, default attributes `['sssd_conf']['ldap_default_bind_dn']` and `['sssd_conf']['ldap_default_authtok']`  are overriden              
 `['sssd_conf']['id_provider']`             | `'ldap'`                                                                       |
 `['sssd_conf']['auth_provider']`           | `'ldap'`                                                                       |
 `['sssd_conf']['chpass_provider']`         | `'ldap'`                                                                       |
