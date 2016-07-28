@@ -2,6 +2,17 @@
 
 This file is used to list changes made in each version of sssd_ldap.
 
+## 3.1.2 (2016-07-28)
+- Added support for chef-vault, so that SSSD sensitive information (i.e bind_dn, bind_authtok) are retrieved from an encrypted vault.
+- REQUIRED: Vault item name to be `:credentials['ldap']`
+- Setting attribute `node['sssd_ldap']['chef_vault']` to true assigns values to `['sssd_ldap']['sssd_conf']['ldap_default_bind_dn'] ` and
+`['sssd_ldap']['sssd_conf']['ldap_default_authtok']` from the vault
+
+## 3.1.1 (2016-07-19)
+- Added support so that SSSD retrieves user's public key from LDAP and uses it for authentication. Also restarts the SSH service for changes to take effect.
+- Added support so that recipe identifies the corrent naming of the SSH service depending on the underlying platform.
+- Added support to recipe to allow updating a PAM file so that user's home directories are automatically created when they login for the first time.
+
 ## 3.1.0 (2016-04-27)
 
 - Added back support for RHEL 5 by making sure not to enable the sudo service on RHEL < 6 as the package is too old

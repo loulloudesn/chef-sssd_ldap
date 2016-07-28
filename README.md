@@ -30,6 +30,8 @@ Arbitrary key/value pairs may be added to the `['sssd_conf']` attribute object. 
 
 Attribute                                  | Value                                                                          | Comment
 ------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------
+`['sssd_ldap']['chef_vault']`              | `'true`                   | use chef-vault (true/false) for retrieving sensitive SSSD information. For now support is provided only for `bind_dn` and `bind_password`. Hence, if se to true, default attributes `['sssd_conf']['ldap_default_bind_dn']` and `['sssd_conf']['ldap_default_authtok']`  are overriden                  
+
 `['sssd_conf']['id_provider']`             | `'ldap'`                                                                       |
 `['sssd_conf']['auth_provider']`           | `'ldap'`                                                                       |
 `['sssd_conf']['chpass_provider']`         | `'ldap'`                                                                       |
@@ -81,6 +83,23 @@ update-ca-trust extract
 ```
 cp ca.crt /usr/local/share/ca-certificates
 update-ca-certificates
+```
+
+## Use of Chef-Vault
+
+If you decide to retrieve SSSD sensitive information from [Chef-Vault](https://docs.chef.io/chef_vault.html), by setting attribute `['sssd_ldap']['chef_vault'] = true`, then you need to create a vault with name `credentials` and a respective item inside the vault with name `ldap`.
+
+For now, the vault is mandatory to include the following two attributes: 
+- `bind_dn`
+- `bind_passwd`
+
+A comprehensive tutorial on creating encrypted vaults is provided [here](https://blog.chef.io/2016/01/21/chef-vault-what-is-it-and-what-can-it-do-for-you/). Use the following JSON as a template file (i.e `ldap.json`) for creating the vault:
+
+```json
+{  
+   "bind_dn":"some_text",
+   "bind_passwd":"some_other_text"
+}
 ```
 
 ## License & Authors
