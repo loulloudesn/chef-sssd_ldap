@@ -18,6 +18,14 @@
 # limitations under the License.
 #
 
+# If chef_vault will be used for retrieving sensitive information
+if node['sssd_ldap']['chef_vault']
+  include_recipe 'chef-vault'
+  vault = chef_vault_item(:credentials,'ldap')
+  node.default['sssd_ldap']['sssd_conf']['ldap_default_bind_dn'] = vault['bind_dn']
+  node.default['sssd_ldap']['sssd_conf']['ldap_default_authtok'] = vault['bind_passwd']
+end
+
 package 'sssd' do
   action :install
 end

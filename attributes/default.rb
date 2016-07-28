@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+default['sssd_ldap']['chef_vault'] = true
+
 default['sssd_ldap']['ssh_service_name'] = case node['platform_family']
                                      when 'rhel', 'fedora', 'suse', 'freebsd', 'gentoo', 'arch'
                                        'sshd'
